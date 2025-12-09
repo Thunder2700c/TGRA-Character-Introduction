@@ -11,14 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameElements = document.querySelectorAll(".profile-names .name");
     const nameHeadings = document.querySelectorAll(".profile-names .name h1");
 
-    // ===== AUTO-SCALE LONG NAMES =====
+    // Auto-scale
     function scaleTextToFit() {
         const containerWidth = window.innerWidth * 0.95;
-        
         nameHeadings.forEach((heading) => {
             heading.style.transform = "scale(1)";
             const textWidth = heading.scrollWidth;
-            
             if (textWidth > containerWidth) {
                 const scale = containerWidth / textWidth;
                 heading.style.transform = `scale(${scale})`;
@@ -29,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scaleTextToFit();
     window.addEventListener("resize", scaleTextToFit);
 
-    // ===== SPLIT TEXT INTO LETTERS =====
+    // Split text
     nameHeadings.forEach((heading) => {
         const split = new SplitText(heading, { type: "chars" });
         split.chars.forEach((char) => {
@@ -39,80 +37,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const defaultLetters = nameElements[0].querySelectorAll(".letter");
 
-    // ===== INITIAL STATES =====
-    gsap.set(defaultLetters, { 
-        yPercent: 0,
-        opacity: 1,
-        force3D: true 
-    });
+    // Initial states
+    gsap.set(defaultLetters, { yPercent: 0, opacity: 1 });
 
     nameElements.forEach((name, index) => {
         if (index > 0) {
             const letters = name.querySelectorAll(".letter");
-            gsap.set(letters, { 
-                yPercent: 120,
-                opacity: 0,
-                force3D: true 
-            });
+            gsap.set(letters, { yPercent: 100, opacity: 0 });
         }
     });
 
-    // ===== TRACK CURRENT STATE =====
     let currentNameLetters = defaultLetters;
-    let currentActiveImage = null;  // Track which image is active (for mobile)
+    let currentActiveImage = null;
+    let isAnimating = false;  // ⬅️ Prevent spam clicking
 
-    // ===== DETECT DEVICE TYPE =====
     function isTouchDevice() {
-        return ('ontouchstart' in window) || 
-               (navigator.maxTouchPoints > 0) || 
-               (navigator.msMaxTouchPoints > 0);
+        return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 
-    // ===== ANIMATION FUNCTIONS (Reusable) =====
+    // ===== SMOOTH ANIMATION FUNCTIONS =====
     
-    // Show a specific name
     function showName(letters, img) {
-        if (currentNameLetters === letters) return;
+        if (currentNameLetters === letters || isAnimating) return;
+        
+        isAnimating = true;
 
-        // Exit current text
-        gsap.to(currentNameLetters, {
-            yPercent: -120,
-            opacity: 0,
-            duration: 0.5,
-            stagger: { each: 0.02, from: "center" },
-            ease: "power4.out",
-            force3D: true
+        // Create a timeline for synchronized animation
+        const tl = gsap.timeline({
+            onComplete: () => { isAnimating = false; }
         });
 
-        // Enter new text
-        gsap.fromTo(letters, 
-            { yPercent: 120, opacity: 0 },
+        // Exit current - SMOOTH fade up
+        tl.to(currentNameLetters, {
+            yPercent: -80,      // ⬅️ Less distance = smoother
+            opacity: 0,
+            duration: 0.4,      // ⬅️ Slightly faster
+            stagger: {
+                each: 0.015,    // ⬅️ Faster stagger
+                from: "center"
+            },
+            ease: "power2.inOut"  // ⬅️ Smoother easing
+        }, 0);
+
+        // Enter new - starts slightly before exit finishes
+        tl.fromTo(letters, 
+            { yPercent: 80, opacity: 0 },  // ⬅️ Less distance
             {
                 yPercent: 0,
                 opacity: 1,
                 duration: 0.5,
-                stagger: { each: 0.02, from: "center" },
-                ease: "power4.out",
-                force3D: true
-            }
+                stagger: {
+                    each: 0.02,
+                    from: "center"
+                },
+                ease: "power2.out"  // ⬅️ Smooth landing
+            }, 
+            0.15  // ⬅️ Overlap animations
         );
 
-        // Enlarge image
+        // Image animation - with subtle scale
         if (img) {
-            // First, reset all other images
             gsap.to(profileImages, {
                 width: 70,
                 height: 70,
+                scale: 1,
                 duration: 0.3,
-                ease: "power4.out"
+                ease: "power2.out"
             });
 
-            // Then enlarge the active one
             gsap.to(img, {
-                width: 140,
-                height: 140,
-                duration: 0.5,
-                ease: "power4.out"
+                width: 130,      // ⬅️ Slightly smaller max
+                height: 130,
+                scale: 1.05,     // ⬅️ Add subtle scale
+                duration: 0.4,
+                ease: "back.out(1.2)"  // ⬅️ Slight bounce
             });
         }
 
@@ -120,154 +118,87 @@ document.addEventListener("DOMContentLoaded", () => {
         currentActiveImage = img;
     }
 
-    // Reset to default "The Squad"
     function resetToDefault() {
-        if (currentNameLetters === defaultLetters) return;
+        if (currentNameLetters === defaultLetters || isAnimating) return;
+        
+        isAnimating = true;
 
-        // Exit current text
-        gsap.to(currentNameLetters, {
-            yPercent: 120,
-            opacity: 0,
-            duration: 0.5,
-            stagger: { each: 0.02, from: "center" },
-            ease: "power4.out",
-            force3D: true
+        const tl = gsap.timeline({
+            onComplete: () => { isAnimating = false; }
         });
 
-        // Enter default text
-        gsap.fromTo(defaultLetters,
-            { yPercent: -120, opacity: 0 },
+        // Exit down
+        tl.to(currentNameLetters, {
+            yPercent: 80,
+            opacity: 0,
+            duration: 0.4,
+            stagger: { each: 0.015, from: "center" },
+            ease: "power2.inOut"
+        }, 0);
+
+        // Enter default
+        tl.fromTo(defaultLetters,
+            { yPercent: -80, opacity: 0 },
             {
                 yPercent: 0,
                 opacity: 1,
                 duration: 0.5,
                 stagger: { each: 0.02, from: "center" },
-                ease: "power4.out",
-                force3D: true
-            }
+                ease: "power2.out"
+            }, 
+            0.15
         );
 
-        // Reset all images
-        gsap.to(profileImages, {
+        // Reset images
+        tl.to(profileImages, {
             width: 70,
             height: 70,
-            duration: 0.5,
-            ease: "power4.out"
-        });
+            scale: 1,
+            duration: 0.4,
+            ease: "power2.out"
+        }, 0);
 
         currentNameLetters = defaultLetters;
         currentActiveImage = null;
     }
 
-    // Shrink single image (for desktop mouseleave)
-    function shrinkImage(img) {
-        gsap.to(img, {
-            width: 70,
-            height: 70,
-            duration: 0.5,
-            ease: "power4.out"
-        });
-    }
-
-    // ===== DESKTOP INTERACTIONS (Mouse) =====
+    // Desktop
     if (window.innerWidth >= 900 && !isTouchDevice()) {
-        
         profileImages.forEach((img, index) => {
             const correspondingName = nameElements[index + 1];
             const letters = correspondingName.querySelectorAll(".letter");
 
-            img.addEventListener("mouseenter", () => {
-                showName(letters, img);
-            });
-
+            img.addEventListener("mouseenter", () => showName(letters, img));
             img.addEventListener("mouseleave", () => {
-                shrinkImage(img);
+                gsap.to(img, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
             });
         });
 
-        profileImagesContainer.addEventListener("mouseleave", () => {
-            resetToDefault();
-        });
+        profileImagesContainer.addEventListener("mouseleave", resetToDefault);
     }
 
-    // ===== MOBILE INTERACTIONS (Touch/Click) =====
+    // Mobile
     if (window.innerWidth < 900 || isTouchDevice()) {
-        
         profileImages.forEach((img, index) => {
             const correspondingName = nameElements[index + 1];
             const letters = correspondingName.querySelectorAll(".letter");
 
-            // Use 'click' which works for both touch and mouse
             img.addEventListener("click", (e) => {
-                e.stopPropagation(); // Prevent bubbling to document
-
-                // If tapping the same image, toggle off (reset)
+                e.stopPropagation();
                 if (currentActiveImage === img) {
                     resetToDefault();
                 } else {
-                    // Show this name
                     showName(letters, img);
                 }
             });
         });
 
-        // Tap anywhere outside images to reset
         document.addEventListener("click", (e) => {
-            // Check if click is outside the profile images
-            const isClickInsideImages = profileImagesContainer.contains(e.target);
-            
-            if (!isClickInsideImages && currentActiveImage !== null) {
-                resetToDefault();
-            }
-        });
-
-        // Also handle tap on the section background
-        document.querySelector("section.team").addEventListener("click", (e) => {
-            // Only reset if clicking directly on section (not on images)
-            if (e.target.classList.contains("team") || 
-                e.target.closest(".profile-names")) {
-                resetToDefault();
-            }
-        });
-    }
-
-    // ===== HANDLE BOTH DESKTOP AND TOUCH ON SAME DEVICE =====
-    // (For laptops with touchscreens)
-    if (window.innerWidth >= 900 && isTouchDevice()) {
-        
-        profileImages.forEach((img, index) => {
-            const correspondingName = nameElements[index + 1];
-            const letters = correspondingName.querySelectorAll(".letter");
-
-            // Touch events
-            img.addEventListener("touchstart", (e) => {
-                e.preventDefault();
-                
-                if (currentActiveImage === img) {
-                    resetToDefault();
-                } else {
-                    showName(letters, img);
-                }
-            });
-
-            // Mouse events still work
-            img.addEventListener("mouseenter", () => {
-                showName(letters, img);
-            });
-
-            img.addEventListener("mouseleave", () => {
-                shrinkImage(img);
-            });
-        });
-
-        profileImagesContainer.addEventListener("mouseleave", () => {
-            resetToDefault();
-        });
-
-        // Touch outside to reset
-        document.addEventListener("touchstart", (e) => {
-            const isInsideImages = profileImagesContainer.contains(e.target);
-            if (!isInsideImages && currentActiveImage !== null) {
+            if (!profileImagesContainer.contains(e.target) && currentActiveImage) {
                 resetToDefault();
             }
         });
