@@ -1,0 +1,141 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+section.team {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0f0f0f;
+  color: #e3e3db;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  overflow: hidden;
+}
+
+.profile-images {
+  position: relative;
+  width: 100%;
+  height: 20rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.img {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  padding: 5px;
+  cursor: pointer;
+  will-change: width, height;
+}
+
+.img img {
+  border-radius: 0.5rem;
+}
+
+.profile-names {
+  position: relative;
+  width: 100%;
+  height: 25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  padding: 0 2rem; /* ⬅️ Add some padding */
+}
+
+.name h1 {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: "Barlow Condensed", sans-serif;
+  
+  /* ⬇️ RESPONSIVE FONT - KEY FIX */
+  font-size: clamp(2rem, 12vw, 15rem);
+  
+  font-weight: 900;
+  letter-spacing: clamp(-0.1rem, -0.3vw, -0.5rem);
+  line-height: 1;
+  color: #f93535;
+  user-select: none;
+  white-space: nowrap;
+  padding: 0;
+  margin: 0;
+  
+  /* ⬇️ Ensure it scales properly */
+  transform-origin: center center;
+}
+
+.name.default h1 {
+  color: #e3e3db;
+}
+
+.name h1 .letter {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 900px) {
+  section.team {
+    flex-direction: column-reverse;
+  }
+
+  .profile-images {
+    flex-wrap: wrap;
+    max-width: 90%;
+    height: auto;
+    padding: 1rem 0;
+  }
+
+  .img {
+    width: 60px;
+    height: 60px;
+    padding: 2.5px;
+  }
+
+  .name h1 {
+    font-size: clamp(1.5rem, 8vw, 4rem);
+    letter-spacing: 0;
+  }
+
+  .profile-names {
+    height: 5rem;
+  }
+}
