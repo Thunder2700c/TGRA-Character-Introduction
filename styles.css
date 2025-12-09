@@ -170,3 +170,54 @@ section.team {
     height: 3rem;
   }
 }
+
+.img {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  padding: 5px;
+  cursor: pointer;
+  
+  /* ⬇️ Smoother GPU rendering */
+  will-change: transform, width, height;
+  transform: translateZ(0);
+  
+  /* ⬇️ Smooth transitions for non-GSAP props */
+  transition: box-shadow 0.3s ease;
+}
+
+/* ⬇️ Subtle hover glow on desktop */
+@media (hover: hover) {
+  .img:hover {
+    box-shadow: 0 0 20px rgba(249, 53, 53, 0.3);
+  }
+}
+
+/* ⬇️ Smoother letter rendering */
+.name h1 .letter {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  
+  /* ⬇️ Prevent layout shift */
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* ⬇️ Add subtle text shadow for depth */
+.name h1 {
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ⬇️ Smooth image border */
+.img img {
+  border-radius: 0.5rem;
+  transition: border-radius 0.3s ease;
+}
+
+.img:hover img {
+  border-radius: 0.75rem;
+}
