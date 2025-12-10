@@ -43,21 +43,10 @@ section.team {
   padding: 5px;
   cursor: pointer;
   will-change: width, height;
-  
-  /* ⬇️ MOBILE: Add tap feedback */
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-}
-
-/* ⬇️ MOBILE: Visual feedback on tap */
-.img:active {
-  transform: scale(0.95);
 }
 
 .img img {
   border-radius: 0.5rem;
-  pointer-events: none; /* Prevent image from capturing events */
 }
 
 .profile-names {
@@ -80,7 +69,7 @@ section.team {
   align-items: center;
   overflow: hidden;
   pointer-events: none;
-  padding: 0 2rem;
+  padding: 0 2rem; /* ⬅️ Add some padding */
 }
 
 .name h1 {
@@ -91,7 +80,10 @@ section.team {
   text-align: center;
   text-transform: uppercase;
   font-family: "Barlow Condensed", sans-serif;
+  
+  /* ⬇️ RESPONSIVE FONT - KEY FIX */
   font-size: clamp(2rem, 12vw, 15rem);
+  
   font-weight: 900;
   letter-spacing: clamp(-0.1rem, -0.3vw, -0.5rem);
   line-height: 1;
@@ -100,6 +92,8 @@ section.team {
   white-space: nowrap;
   padding: 0;
   margin: 0;
+  
+  /* ⬇️ Ensure it scales properly */
   transform-origin: center center;
 }
 
@@ -118,11 +112,9 @@ section.team {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== RESPONSIVE - MOBILE ===== */
 @media (max-width: 900px) {
   section.team {
     flex-direction: column-reverse;
-    padding: 2rem 0;
   }
 
   .profile-images {
@@ -130,7 +122,6 @@ section.team {
     max-width: 90%;
     height: auto;
     padding: 1rem 0;
-    gap: 0.5rem;
   }
 
   .img {
@@ -147,77 +138,4 @@ section.team {
   .profile-names {
     height: 5rem;
   }
-
-  /* ⬇️ MOBILE: Larger tap targets */
-  .img {
-    min-width: 50px;
-    min-height: 50px;
-  }
-}
-
-/* ===== VERY SMALL SCREENS ===== */
-@media (max-width: 400px) {
-  .img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .name h1 {
-    font-size: clamp(1rem, 6vw, 2rem);
-  }
-
-  .profile-names {
-    height: 3rem;
-  }
-}
-
-.img {
-  position: relative;
-  width: 70px;
-  height: 70px;
-  padding: 5px;
-  cursor: pointer;
-  
-  /* ⬇️ Smoother GPU rendering */
-  will-change: transform, width, height;
-  transform: translateZ(0);
-  
-  /* ⬇️ Smooth transitions for non-GSAP props */
-  transition: box-shadow 0.3s ease;
-}
-
-/* ⬇️ Subtle hover glow on desktop */
-@media (hover: hover) {
-  .img:hover {
-    box-shadow: 0 0 20px rgba(249, 53, 53, 0.3);
-  }
-}
-
-/* ⬇️ Smoother letter rendering */
-.name h1 .letter {
-  display: inline-block;
-  position: relative;
-  vertical-align: top;
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  
-  /* ⬇️ Prevent layout shift */
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-/* ⬇️ Add subtle text shadow for depth */
-.name h1 {
-  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* ⬇️ Smooth image border */
-.img img {
-  border-radius: 0.5rem;
-  transition: border-radius 0.3s ease;
-}
-
-.img:hover img {
-  border-radius: 0.75rem;
 }
