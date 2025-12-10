@@ -11,23 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameElements = document.querySelectorAll(".profile-names .name");
     const nameHeadings = document.querySelectorAll(".profile-names .name h1");
 
-    // Auto-scale
-    function scaleTextToFit() {
-        const containerWidth = window.innerWidth * 0.95;
-        nameHeadings.forEach((heading) => {
-            heading.style.transform = "scale(1)";
-            const textWidth = heading.scrollWidth;
-            if (textWidth > containerWidth) {
-                const scale = containerWidth / textWidth;
-                heading.style.transform = `scale(${scale})`;
-            }
-        });
-    }
-    
-    scaleTextToFit();
-    window.addEventListener("resize", scaleTextToFit);
-
-    // Split text
+    // Split text into letters
     nameHeadings.forEach((heading) => {
         const split = new SplitText(heading, { type: "chars" });
         split.chars.forEach((char) => {
@@ -37,80 +21,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const defaultLetters = nameElements[0].querySelectorAll(".letter");
 
-    // Initial states
-    gsap.set(defaultLetters, { yPercent: 0, opacity: 1 });
+    // ===== INITIAL STATES =====
+    gsap.set(defaultLetters, { 
+        yPercent: 0,
+        opacity: 1,
+        force3D: true 
+    });
 
     nameElements.forEach((name, index) => {
         if (index > 0) {
             const letters = name.querySelectorAll(".letter");
-            gsap.set(letters, { yPercent: 100, opacity: 0 });
+            gsap.set(letters, { 
+                yPercent: 120,
+                opacity: 0,
+                force3D: true 
+            });
         }
     });
 
     let currentNameLetters = defaultLetters;
     let currentActiveImage = null;
-    let isAnimating = false;  // ⬅️ Prevent spam clicking
+    let isAnimating = false;
 
+    // ===== DETECT DEVICE =====
     function isTouchDevice() {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 
-    // ===== SMOOTH ANIMATION FUNCTIONS =====
-    
+    // ===== ANIMATION FUNCTIONS (Same for Desktop & Mobile) =====
+
     function showName(letters, img) {
         if (currentNameLetters === letters || isAnimating) return;
         
         isAnimating = true;
 
-        // Create a timeline for synchronized animation
-        const tl = gsap.timeline({
-            onComplete: () => { isAnimating = false; }
+        // Current text: EXIT UP
+        gsap.to(currentNameLetters, {
+            yPercent: -120,
+            opacity: 0,
+            duration: 0.5,
+            stagger: { each: 0.02, from: "center" },
+            ease: "power4.out",
+            force3D: true
         });
 
-        // Exit current - SMOOTH fade up
-        tl.to(currentNameLetters, {
-            yPercent: -80,      // ⬅️ Less distance = smoother
-            opacity: 0,
-            duration: 0.4,      // ⬅️ Slightly faster
-            stagger: {
-                each: 0.015,    // ⬅️ Faster stagger
-                from: "center"
+        // New text: ENTER FROM BELOW
+        gsap.fromTo(letters, 
+            {
+                yPercent: 120,
+                opacity: 0
             },
-            ease: "power2.inOut"  // ⬅️ Smoother easing
-        }, 0);
-
-        // Enter new - starts slightly before exit finishes
-        tl.fromTo(letters, 
-            { yPercent: 80, opacity: 0 },  // ⬅️ Less distance
             {
                 yPercent: 0,
                 opacity: 1,
                 duration: 0.5,
-                stagger: {
-                    each: 0.02,
-                    from: "center"
-                },
-                ease: "power2.out"  // ⬅️ Smooth landing
-            }, 
-            0.15  // ⬅️ Overlap animations
+                stagger: { each: 0.02, from: "center" },
+                ease: "power4.out",
+                force3D: true,
+                onComplete: () => { isAnimating = false; }
+            }
         );
 
-        // Image animation - with subtle scale
+        // Enlarge image
         if (img) {
+            // Reset all images first
             gsap.to(profileImages, {
                 width: 70,
                 height: 70,
-                scale: 1,
                 duration: 0.3,
-                ease: "power2.out"
+                ease: "power4.out"
             });
 
+            // Enlarge active image
             gsap.to(img, {
-                width: 130,      // ⬅️ Slightly smaller max
-                height: 130,
-                scale: 1.05,     // ⬅️ Add subtle scale
-                duration: 0.4,
-                ease: "back.out(1.2)"  // ⬅️ Slight bounce
+                width: 140,
+                height: 140,
+                duration: 0.5,
+                ease: "power4.out"
             });
         }
 
@@ -123,72 +110,86 @@ document.addEventListener("DOMContentLoaded", () => {
         
         isAnimating = true;
 
-        const tl = gsap.timeline({
-            onComplete: () => { isAnimating = false; }
+        // Current name: EXIT DOWN
+        gsap.to(currentNameLetters, {
+            yPercent: 120,
+            opacity: 0,
+            duration: 0.5,
+            stagger: { each: 0.02, from: "center" },
+            ease: "power4.out",
+            force3D: true
         });
 
-        // Exit down
-        tl.to(currentNameLetters, {
-            yPercent: 80,
-            opacity: 0,
-            duration: 0.4,
-            stagger: { each: 0.015, from: "center" },
-            ease: "power2.inOut"
-        }, 0);
-
-        // Enter default
-        tl.fromTo(defaultLetters,
-            { yPercent: -80, opacity: 0 },
+        // Default: ENTER FROM ABOVE
+        gsap.fromTo(defaultLetters,
+            {
+                yPercent: -120,
+                opacity: 0
+            },
             {
                 yPercent: 0,
                 opacity: 1,
                 duration: 0.5,
                 stagger: { each: 0.02, from: "center" },
-                ease: "power2.out"
-            }, 
-            0.15
+                ease: "power4.out",
+                force3D: true,
+                onComplete: () => { isAnimating = false; }
+            }
         );
 
-        // Reset images
-        tl.to(profileImages, {
+        // Reset all images
+        gsap.to(profileImages, {
             width: 70,
             height: 70,
-            scale: 1,
-            duration: 0.4,
-            ease: "power2.out"
-        }, 0);
+            duration: 0.5,
+            ease: "power4.out"
+        });
 
         currentNameLetters = defaultLetters;
         currentActiveImage = null;
     }
 
-    // Desktop
+    function shrinkImage(img) {
+        gsap.to(img, {
+            width: 70,
+            height: 70,
+            duration: 0.5,
+            ease: "power4.out"
+        });
+    }
+
+    // ===== DESKTOP (Mouse Hover) =====
     if (window.innerWidth >= 900 && !isTouchDevice()) {
+        
         profileImages.forEach((img, index) => {
             const correspondingName = nameElements[index + 1];
             const letters = correspondingName.querySelectorAll(".letter");
 
-            img.addEventListener("mouseenter", () => showName(letters, img));
+            img.addEventListener("mouseenter", () => {
+                showName(letters, img);
+            });
+
             img.addEventListener("mouseleave", () => {
-                gsap.to(img, {
-                    scale: 1,
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
+                shrinkImage(img);
             });
         });
 
-        profileImagesContainer.addEventListener("mouseleave", resetToDefault);
+        profileImagesContainer.addEventListener("mouseleave", () => {
+            resetToDefault();
+        });
     }
 
-    // Mobile
+    // ===== MOBILE (Touch/Tap) =====
     if (window.innerWidth < 900 || isTouchDevice()) {
+        
         profileImages.forEach((img, index) => {
             const correspondingName = nameElements[index + 1];
             const letters = correspondingName.querySelectorAll(".letter");
 
             img.addEventListener("click", (e) => {
                 e.stopPropagation();
+                
+                // Tap same image = reset
                 if (currentActiveImage === img) {
                     resetToDefault();
                 } else {
@@ -197,7 +198,48 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        // Tap outside = reset
         document.addEventListener("click", (e) => {
+            if (!profileImagesContainer.contains(e.target) && currentActiveImage) {
+                resetToDefault();
+            }
+        });
+    }
+
+    // ===== HYBRID DEVICES (Laptop with touchscreen) =====
+    if (window.innerWidth >= 900 && isTouchDevice()) {
+        
+        profileImages.forEach((img, index) => {
+            const correspondingName = nameElements[index + 1];
+            const letters = correspondingName.querySelectorAll(".letter");
+
+            // Touch support
+            img.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                
+                if (currentActiveImage === img) {
+                    resetToDefault();
+                } else {
+                    showName(letters, img);
+                }
+            });
+
+            // Mouse still works
+            img.addEventListener("mouseenter", () => {
+                showName(letters, img);
+            });
+
+            img.addEventListener("mouseleave", () => {
+                shrinkImage(img);
+            });
+        });
+
+        profileImagesContainer.addEventListener("mouseleave", () => {
+            resetToDefault();
+        });
+
+        // Touch outside = reset
+        document.addEventListener("touchstart", (e) => {
             if (!profileImagesContainer.contains(e.target) && currentActiveImage) {
                 resetToDefault();
             }
