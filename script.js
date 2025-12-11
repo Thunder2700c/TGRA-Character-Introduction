@@ -41,19 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let currentNameLetters = defaultLetters;
     let currentActiveImage = null;
-    let isAnimating = false;
 
     // ===== DETECT DEVICE =====
     function isTouchDevice() {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 
-    // ===== ANIMATION FUNCTIONS (Same for Desktop & Mobile) =====
+    // ===== ANIMATION FUNCTIONS =====
 
     function showName(letters, img) {
-        if (currentNameLetters === letters || isAnimating) return;
-        
-        isAnimating = true;
+        if (currentNameLetters === letters) return;
 
         // Current text: EXIT UP
         gsap.to(currentNameLetters, {
@@ -62,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             duration: 0.5,
             stagger: { each: 0.02, from: "center" },
             ease: "power4.out",
+            overwrite: true,
             force3D: true
         });
 
@@ -77,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 duration: 0.5,
                 stagger: { each: 0.02, from: "center" },
                 ease: "power4.out",
-                force3D: true,
-                onComplete: () => { isAnimating = false; }
+                overwrite: true,
+                force3D: true
             }
         );
 
@@ -89,7 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 width: 70,
                 height: 70,
                 duration: 0.3,
-                ease: "power4.out"
+                ease: "power4.out",
+                overwrite: true
             });
 
             // Enlarge active image
@@ -97,7 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 width: 140,
                 height: 140,
                 duration: 0.5,
-                ease: "power4.out"
+                ease: "power4.out",
+                overwrite: true
             });
         }
 
@@ -106,9 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function resetToDefault() {
-        if (currentNameLetters === defaultLetters || isAnimating) return;
-        
-        isAnimating = true;
+        if (currentNameLetters === defaultLetters) return;
 
         // Current name: EXIT DOWN
         gsap.to(currentNameLetters, {
@@ -117,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             duration: 0.5,
             stagger: { each: 0.02, from: "center" },
             ease: "power4.out",
+            overwrite: true,
             force3D: true
         });
 
@@ -132,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 duration: 0.5,
                 stagger: { each: 0.02, from: "center" },
                 ease: "power4.out",
-                force3D: true,
-                onComplete: () => { isAnimating = false; }
+                overwrite: true,
+                force3D: true
             }
         );
 
@@ -142,7 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 70,
             height: 70,
             duration: 0.5,
-            ease: "power4.out"
+            ease: "power4.out",
+            overwrite: true
         });
 
         currentNameLetters = defaultLetters;
@@ -154,7 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 70,
             height: 70,
             duration: 0.5,
-            ease: "power4.out"
+            ease: "power4.out",
+            overwrite: true
         });
     }
 
